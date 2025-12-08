@@ -12,3 +12,7 @@ tqdm
 keras
 streamlit
 bs4
+requests
+lxml
+statsmodels
+scipy
