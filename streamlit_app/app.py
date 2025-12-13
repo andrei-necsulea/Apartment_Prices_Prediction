@@ -71,7 +71,7 @@ st.sidebar.write(f"Min: {min_year}, Max: {max_year}")
 df_filtered = df.copy()
 
 #If user selects "real only", restrict to 2012+ first
-if mode == "All period 1900–2025":
+if mode == "Only real period (2012–2025)":
     df_filtered = df_filtered[df_filtered["year"] >= 2012]
 
 #Then apply the year range filter from the slider
@@ -239,10 +239,203 @@ if not df_filtered.empty:
         height=300,
     )
 
-# Raw data table for the filtered range
 st.subheader("Raw data in the selected range")
 
 st.dataframe(
     df_filtered[["date", "price_per_sqm"]]
     .reset_index(drop=True)
+)
+
+#Extra sidebar options for model-based data
+show_forecast = st.sidebar.checkbox("Show forecast 2026–2050", value=True)
+show_gen8_debug = st.sidebar.checkbox("Show generator (gen8) debug view", value=False)
+
+#Cached loaders for forecast and gen8 datasets
+@st.cache_data
+def load_forecast(path="../results/forecast_2026_2050.csv"):
+    df_fc = pd.read_csv(path)
+
+    # Build a proper datetime column
+    if "date" in df_fc.columns:
+        df_fc["date"] = pd.to_datetime(df_fc["date"])
+    elif "Date" in df_fc.columns:
+        df_fc["date"] = pd.to_datetime(df_fc["Date"])
+    elif "An" in df_fc.columns:
+        df_fc["date"] = pd.to_datetime(df_fc["An"].astype(str) + "-01-01")
+    else:
+        raise ValueError("Forecast CSV must contain 'date', 'Date' or 'An'.")
+
+    #Normalize price column name
+    if "predicted_price_sqm" in df_fc.columns:
+        df_fc = df_fc.rename(columns={"predicted_price_sqm": "price_per_sqm"})
+    elif "price_per_sqm" not in df_fc.columns:
+        raise ValueError("Forecast CSV must contain 'predicted_price_sqm' or 'price_per_sqm'.")
+
+    df_fc = df_fc[["date", "price_per_sqm"]].sort_values("date").reset_index(drop=True)
+    return df_fc
+
+
+@st.cache_data
+def load_gen8(path="../merged_data/full_gen8.csv"):
+    """
+    Load the gen8 generator dataset (historical model features).
+    Tries to infer the main price column and keep 'An' as x-axis.
+    """
+    df_g8 = pd.read_csv(path)
+
+    #Try to infer which column holds the price
+    candidate_price_cols = [
+        "price_per_sqm_final",
+        "price_per_sqm_initial",
+        "price_per_sqm",
+    ]
+    price_col = None
+    for c in candidate_price_cols:
+        if c in df_g8.columns:
+            price_col = c
+            break
+    if price_col is None:
+        raise ValueError("Could not find a price column in full_gen8.csv.")
+
+    df_g8 = df_g8[["An", price_col]].rename(columns={price_col: "price_per_sqm"})
+    df_g8 = df_g8.sort_values("An").reset_index(drop=True)
+    return df_g8
+
+@st.cache_data
+def load_gen8(path="../merged_data/full_gen8.csv"):
+    """
+    Load the gen8 generator dataset (historical model features).
+    Keeps all columns (pib, inflatie, index_cost_mat etc.) and
+    normalizes doar coloana de preț la 'price_per_sqm'.
+    """
+    df_g8 = pd.read_csv(path)
+
+    if "An" not in df_g8.columns:
+        raise ValueError("full_gen8.csv must contain column 'An'.")
+
+    #try to infer which column holds the price
+    candidate_price_cols = [
+        "price_per_sqm_final",
+        "price_per_sqm_initial",
+        "price_per_sqm",
+    ]
+    price_col = None
+    for c in candidate_price_cols:
+        if c in df_g8.columns:
+            price_col = c
+            break
+    if price_col is None:
+        raise ValueError("Could not find a price column in full_gen8.csv.")
+
+    # rename doar coloana de preț, restul rămân la fel
+    if price_col != "price_per_sqm":
+        df_g8 = df_g8.rename(columns={price_col: "price_per_sqm"})
+
+    df_g8 = df_g8.sort_values("An").reset_index(drop=True)
+    return df_g8
+
+
+#optional gen8 debug / insight section
+if show_gen8_debug:
+    st.subheader("Formula historical generator – debug view")
+
+    df_gen8 = load_gen8()
+
+    fig_g8, ax_g8 = plt.subplots(figsize=(14, 4))
+    ax_g8.plot(df_gen8["An"], df_gen8["price_per_sqm"], linewidth=1.8)
+    ax_g8.set_xlabel("Year")
+    ax_g8.set_ylabel("Price (RON/sqm)")
+    ax_g8.set_title("Generated synthetic historical series (model-level view)")
+    ax_g8.grid(True, linestyle="--", alpha=0.3)
+
+    st.pyplot(fig_g8)
+
+    st.markdown("**Full data :**")
+    #afisam toate coloanele (An, index_cost_mat, urban_incr_proc, rata_infl, pib_dolj_mld_ron, price_per_sqm etc.)
+    st.dataframe(df_gen8.head(50))
+
+@st.cache_data
+def load_ensemble_forecast(
+    path="../results/ensemble_ss_catboost_forecast_2026_2050.csv"
+):
+    df_ens = pd.read_csv(path)
+
+    # build datetime
+    if "date" in df_ens.columns:
+        df_ens["date"] = pd.to_datetime(df_ens["date"])
+    elif "An" in df_ens.columns:
+        df_ens["date"] = pd.to_datetime(df_ens["An"].astype(str) + "-01-01")
+    else:
+        raise ValueError("Ensemble CSV must contain 'An' or 'date'.")
+
+    # normalize final prediction column
+    if "price_pred" in df_ens.columns:
+        df_ens = df_ens.rename(columns={"price_pred": "price_per_sqm"})
+    elif "price_per_sqm" not in df_ens.columns:
+        raise ValueError(
+            "Ensemble CSV must contain 'price_pred' or 'price_per_sqm'."
+        )
+
+    df_ens = df_ens.sort_values("date").reset_index(drop=True)
+    return df_ens
+
+if show_forecast:
+    st.subheader(
+        "Ensemble forecast 2026–2050 "
+        "(State Space + CatBoost pe reziduuri)"
+    )
+
+    df_ens = load_ensemble_forecast()
+
+    # context istoric (ultimii ani reali)
+    hist_tail = df[df["year"] >= 2000][["date", "price_per_sqm"]]
+    hist_tail = hist_tail.assign(source="Historical / real")
+
+    ens_plot = df_ens.assign(source="Ensemble forecast")
+
+    df_plot = pd.concat([hist_tail, ens_plot], ignore_index=True)
+
+    fig_ens, ax_ens = plt.subplots(figsize=(14, 5))
+
+    # historical
+    mask_hist = df_plot["source"] == "Historical / real"
+    ax_ens.plot(
+        df_plot.loc[mask_hist, "date"],
+        df_plot.loc[mask_hist, "price_per_sqm"],
+        linewidth=2,
+        label="Historical / real (from 2000)",
+    )
+
+    # ensemble forecast
+    mask_ens = df_plot["source"] == "Ensemble forecast"
+    ax_ens.plot(
+        df_plot.loc[mask_ens, "date"],
+        df_plot.loc[mask_ens, "price_per_sqm"],
+        linestyle="--",
+        linewidth=2.5,
+        color="tab:green",
+        label="Ensemble forecast (SS + CatBoost)",
+    )
+
+    ax_ens.set_xlabel("Year")
+    ax_ens.set_ylabel("Price (RON/sqm)")
+    ax_ens.set_title(
+        "Apartment price forecast – Ensemble model "
+        "(State Space + CatBoost residuals)"
+    )
+    ax_ens.grid(True, linestyle="--", alpha=0.3)
+    ax_ens.legend(loc="upper left")
+
+    st.pyplot(fig_ens)
+
+    st.markdown("**Ensemble forecast data (2026–2050):**")
+    st.dataframe(df_ens.reset_index(drop=True))
+
+st.info(
+    "This forecast is generated using a hybrid ensemble model:\n"
+    "- State Space model captures the long-term economic trend\n"
+    "- CatBoost models the residuals (non-linear corrections)\n"
+    "- Final prediction = trend + learned residual adjustment\n\n"
+    "This approach preserves economic coherence while improving "
+    "short- and medium-term dynamics."
 )

@@ -1,0 +1,95 @@
+=== Baseline State Space (2012–2022 -> 2023–2025) ===
+       An  price_real    base_pred
+123  2023     7350.96  6835.446707
+124  2024     8344.82  6694.266068
+125  2025    10017.45  7033.432974
+
+MAE  (base)  = 1716.69 RON/sqm
+RMSE (base)  = 1991.18 RON/sqm
+MAPE (base)  = 18.86 %
+
+=== GBR simplu (direct pe price_per_sqm) ===
+       An  price_real     gbr_pred
+123  2023     7350.96  7127.679910
+124  2024     8344.82  7017.733595
+125  2025    10017.45  7127.679910
+
+MAE  (GBR)   = 1480.05 RON/sqm
+RMSE (GBR)   = 1840.45 RON/sqm
+MAPE (GBR)   = 15.93 %
+
+=== LightGBM (direct pe price_per_sqm) ===
+       An  price_real    lgbm_pred
+123  2023     7350.96  4605.047252
+124  2024     8344.82  4605.047252
+125  2025    10017.45  4605.047252
+
+MAE  (LGBM)  = 3966.03 RON/sqm
+RMSE (LGBM)  = 4115.82 RON/sqm
+MAPE (LGBM)  = 45.40 %
+
+=== XGBoost (direct pe price_per_sqm) ===
+       An  price_real     xgb_pred
+123  2023     7350.96  6464.644043
+124  2024     8344.82  6814.079590
+125  2025    10017.45  6814.079590
+
+MAE  (XGB)   = 1873.48 RON/sqm
+RMSE (XGB)   = 2112.68 RON/sqm
+MAPE (XGB)   = 20.79 %
+
+=== Hybrid (State Space + GBR residuals) ===
+       An  price_real  hybrid_pred
+123  2023     7350.96  6843.506829
+124  2024     8344.82  6687.781016
+125  2025    10017.45  7041.493095
+
+MAE  (hybrid) = 1713.48 RON/sqm
+RMSE (hybrid) = 1988.27 RON/sqm
+MAPE (hybrid) = 18.82 %
+
+=== CatBoost (direct pe price_per_sqm) ===
+       An  price_real     cat_pred
+123  2023     7350.96  7248.231239
+124  2024     8344.82  7175.131818
+125  2025    10017.45  7248.231239
+
+MAE  (hybrid) = 1347.21 RON/sqm
+RMSE (hybrid) = 1736.60 RON/sqm
+MAPE (hybrid) = 14.35 %
+
+=== ExtraTrees (direct pe price_per_sqm) ===
+       An  price_real     et_pred
+123  2023     7350.96  6980.17869
+124  2024     8344.82  6936.84981
+125  2025    10017.45  6994.87956
+
+MAE  (hybrid) = 1600.44 RON/sqm
+RMSE (hybrid) = 1936.99 RON/sqm
+MAPE (hybrid) = 17.36 %
+
+=== NGBoost (direct pe price_per_sqm) ===
+       An  price_real     ngb_pred
+123  2023     7350.96  7091.897606
+124  2024     8344.82  7003.562878
+125  2025    10017.45  7091.897606
+
+MAE  (NGB)   = 1508.62 RON/sqm
+RMSE (NGB)   = 1864.13 RON/sqm
+MAPE (NGB)   = 16.27 %
+
+=== Gaussian Process (direct pe price_per_sqm) ===
+       An  price_real     gpr_pred
+123  2023     7350.96  7424.950949
+124  2024     8344.82  7292.484149
+125  2025    10017.45  7291.801869
+
+MAE  (GPR)   = 1283.99 RON/sqm
+RMSE (GPR)   = 1687.41 RON/sqm
+MAPE (GPR)   = 13.61 %
+
+=== GPR 95% confidence intervals ===
+       An  price_real   gpr_low_95  gpr_high_95
+123  2023     7350.96  6456.395514  8393.506385
+124  2024     8344.82  5484.168064  9100.800234
+125  2025    10017.45  5213.036582  9370.567155

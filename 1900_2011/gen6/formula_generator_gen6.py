@@ -4,10 +4,6 @@ from datetime import date
 
 
 def generate_historical_series(seed: int | None = 42) -> pd.DataFrame:
-    """
-    Genereaza seria anuala 1900-2011 pe baza de formule/regimuri.
-    Returneaza un DataFrame cu coloanele: date, price_per_sqm (in LEI).
-    """
     if seed is not None:
         np.random.seed(seed)
 
@@ -71,14 +67,13 @@ def generate_historical_series(seed: int | None = 42) -> pd.DataFrame:
     return df
 
 
-# 2011 - 75% din pretul din 2012
+#2011 - 75% din pretul din 2012
 
-REAL_CSV = "../../2012_2025/craiova_apartment_prices_2012_2025.csv"  # deja convertit în LEI
+REAL_CSV = "../../2012_2025/craiova_apartment_prices_2012_2025.csv"
 
 df_real = pd.read_csv(REAL_CSV, parse_dates=["date"])
 first_real_price = df_real.iloc[0]["price_per_sqm"]
 
-# Target 2011 = 75% din 2012-01
 TARGET_2011 = first_real_price * 0.65
 
 df_hist = generate_historical_series(seed=42)
@@ -96,14 +91,12 @@ df_hist["price_per_sqm"] *= scale_factor
 print("Pret 2011 dupa scalare:",
       df_hist.loc[df_hist["date"].dt.year == 2011, "price_per_sqm"].iloc[0])
 
-# Salvare finala
 df_hist.to_csv("craiova_apartment_prices_1900_2011_gen6.csv", index=False)
 print("\nAm salvat:", "craiova_apartment_prices_1900_2011_gen6.csv")
 
 def generate_chart():
     import matplotlib.pyplot as plt
 
-    # Citim seria istorica deja generata
     df = pd.read_csv("craiova_apartment_prices_1900_2011_gen6.csv", parse_dates=["date"])
 
     plt.figure(figsize=(14, 6))
@@ -111,22 +104,20 @@ def generate_chart():
     plt.plot(df["date"], df["price_per_sqm"], color="steelblue", linewidth=2)
 
     plt.title(
-        "Evoluția prețului mediu pe metrul pătrat (LEI/m²)\nCraiova, 1900–2011",
+        "Evolutia pretului mediu pe metrul patrat (RON/sqm)\nCraiova, 1900–2011",
         fontsize=16,
         fontweight="bold",
     )
     plt.xlabel("Anul", fontsize=13)
-    plt.ylabel("Preț (LEI/m²)", fontsize=13)
+    plt.ylabel("Pret (RON/sqm)", fontsize=13)
 
-    # grid + margini
     plt.grid(True, linestyle="--", alpha=0.3)
     plt.tight_layout()
 
-    # salvare
     plt.savefig("craiova_prices_1900_2011_lei.png", dpi=200)
     plt.show()
 
-    print("Grafic salvat ca: craiova_prices_1900_2011_gen6.png")
+    print("Saved: craiova_prices_1900_2011_gen6.png")
 
 generate_chart()
 

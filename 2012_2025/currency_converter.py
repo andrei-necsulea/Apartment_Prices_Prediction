@@ -24,13 +24,8 @@ def convert_euro_to_lei(
     input_csv="craiova_apartment_prices_2012_2025_euro.csv",
     output_csv="craiova_apartment_prices_2012_2025_lei.csv",
 ):
-    # Citim CSV-ul de baza
-    df = pd.read_csv(input_csv)
 
-    # Presupun cateva lucruri:
-    #  - exista o coloana 'date' (tip string) -> o convertim la datetime
-    #  - exista o coloana 'price_per_sqm' in euro
-    # Daca numele sunt altele, le modifici mai jos.
+    df = pd.read_csv(input_csv)
     df["date"] = pd.to_datetime(df["date"])
     df["year"] = df["date"].dt.year
 

@@ -11,7 +11,7 @@ from datetime import date
 
 prices = []
 
-#plecam de la aprox 250 lei/m² in 1900, ceea ce e realist pentru salariile vremii
+#plecam de la aprox 250 lei/sqm in 1900, ceea ce e realist pentru salariile vremii
 #un functionar avea in jur de 260 lei salariu pe luna
 current_price = 250.0
 
