@@ -252,7 +252,7 @@ show_gen8_debug = st.sidebar.checkbox("Show generator (gen8) debug view", value=
 
 #Cached loaders for forecast and gen8 datasets
 @st.cache_data
-def load_forecast(path="../results/forecast_2026_2050.csv"):
+def load_forecast(path="https://github.com/andrei-necsulea/Apartment_Prices_Prediction/blob/main/results/forecast_2026_2050.csv"):
     df_fc = pd.read_csv(path)
 
     # Build a proper datetime column
@@ -276,7 +276,7 @@ def load_forecast(path="../results/forecast_2026_2050.csv"):
 
 
 @st.cache_data
-def load_gen8(path="../merged_data/full_gen8.csv"):
+def load_gen8(path="https://github.com/andrei-necsulea/Apartment_Prices_Prediction/blob/main/merged_data/full_gen8.csv"):
     """
     Load the gen8 generator dataset (historical model features).
     Tries to infer the main price column and keep 'An' as x-axis.
@@ -302,7 +302,7 @@ def load_gen8(path="../merged_data/full_gen8.csv"):
     return df_g8
 
 @st.cache_data
-def load_gen8(path="../merged_data/full_gen8.csv"):
+def load_gen8(path="https://github.com/andrei-necsulea/Apartment_Prices_Prediction/blob/main/merged_data/full_gen8.csv"):
     """
     Load the gen8 generator dataset (historical model features).
     Keeps all columns (pib, inflatie, index_cost_mat etc.) and
@@ -356,7 +356,7 @@ if show_gen8_debug:
 
 @st.cache_data
 def load_ensemble_forecast(
-    path="../results/ensemble_ss_catboost_forecast_2026_2050.csv"
+    path="https://github.com/andrei-necsulea/Apartment_Prices_Prediction/blob/main/results/ensemble_ss_catboost_forecast_2026_2050.csv"
 ):
     df_ens = pd.read_csv(path)
 
