@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #Path to the final merged dataset (historical + real data + forecasts)
-DATA_PATH = "../results/craiova_apartment_prices_1900_2035.csv"
+DATA_PATH = "https://github.com/andrei-necsulea/Apartment_Prices_Prediction/blob/main/results/craiova_apartment_prices_1900_2035.csv"
 
 
 @st.cache_data
