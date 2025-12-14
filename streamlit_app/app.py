@@ -4,19 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #Path to the final merged dataset (historical + real data + forecasts)
-DATA_PATH = "https://github.com/andrei-necsulea/Apartment_Prices_Prediction/blob/main/results/craiova_apartment_prices_1900_2035.csv"
+DATA_PATH = "https://raw.githubusercontent.com/andrei-necsulea/Apartment_Prices_Prediction/refs/heads/main/results/craiova_apartment_prices_1900_2035.csv"
 
 
 @st.cache_data
 def load_data(path=DATA_PATH):
-    """
-    Load the apartment prices dataset, sort it by date,
-    and add helper columns for 'year' and 'decade'.
-
-    The CSV is expected to have at least:
-        - 'date' (parseable as datetime)
-        - 'price_per_sqm' (float, price in LEI/m²)
-    """
     df = pd.read_csv(path, parse_dates=["date"])
     df = df.sort_values("date").reset_index(drop=True)
 
@@ -252,7 +244,7 @@ show_gen8_debug = st.sidebar.checkbox("Show generator (gen8) debug view", value=
 
 #Cached loaders for forecast and gen8 datasets
 @st.cache_data
-def load_forecast(path="https://github.com/andrei-necsulea/Apartment_Prices_Prediction/blob/main/results/forecast_2026_2050.csv"):
+def load_forecast(path="https://raw.githubusercontent.com/andrei-necsulea/Apartment_Prices_Prediction/refs/heads/main/results/forecast_2026_2050.csv"):
     df_fc = pd.read_csv(path)
 
     # Build a proper datetime column
@@ -276,7 +268,7 @@ def load_forecast(path="https://github.com/andrei-necsulea/Apartment_Prices_Pred
 
 
 @st.cache_data
-def load_gen8(path="https://github.com/andrei-necsulea/Apartment_Prices_Prediction/blob/main/merged_data/full_gen8.csv"):
+def load_gen8(path="https://raw.githubusercontent.com/andrei-necsulea/Apartment_Prices_Prediction/refs/heads/main/merged_data/full_gen8.csv"):
     """
     Load the gen8 generator dataset (historical model features).
     Tries to infer the main price column and keep 'An' as x-axis.
@@ -302,7 +294,7 @@ def load_gen8(path="https://github.com/andrei-necsulea/Apartment_Prices_Predicti
     return df_g8
 
 @st.cache_data
-def load_gen8(path="https://github.com/andrei-necsulea/Apartment_Prices_Prediction/blob/main/merged_data/full_gen8.csv"):
+def load_gen8(path="https://raw.githubusercontent.com/andrei-necsulea/Apartment_Prices_Prediction/refs/heads/main/merged_data/full_gen8.csv"):
     """
     Load the gen8 generator dataset (historical model features).
     Keeps all columns (pib, inflatie, index_cost_mat etc.) and
@@ -356,7 +348,7 @@ if show_gen8_debug:
 
 @st.cache_data
 def load_ensemble_forecast(
-    path="https://github.com/andrei-necsulea/Apartment_Prices_Prediction/blob/main/results/ensemble_ss_catboost_forecast_2026_2050.csv"
+    path="https://raw.githubusercontent.com/andrei-necsulea/Apartment_Prices_Prediction/refs/heads/main/results/ensemble_ss_catboost_forecast_2026_2050.csv"
 ):
     df_ens = pd.read_csv(path)
 
