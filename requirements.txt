@@ -18,3 +18,4 @@ statsmodels
 scipy
 catboost
 ngboost
+shap
